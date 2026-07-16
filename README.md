@@ -130,6 +130,38 @@ gcloud run deploy stadiumpilot-ai \
 
 ---
 
+## ⚡ Vercel Serverless Deployment
+
+StadiumPilot AI is pre-configured to deploy on Vercel with zero extra code modifications:
+
+1. **Install Vercel CLI** (Optional, if deploying from terminal):
+   ```bash
+   npm install -g vercel
+   ```
+2. **Deploy to Vercel**:
+   Run the deployment command in the project directory:
+   ```bash
+   vercel
+   ```
+3. **Configure Environment Variables**:
+   - In your Vercel Dashboard, navigate to **Settings > Environment Variables**.
+   - Add a new environment variable:
+     - **Key**: `GEMINI_API_KEY`
+     - **Value**: `your_actual_gemini_api_key`
+4. **Deploy to Production**:
+   ```bash
+   vercel --prod
+   ```
+
+### Recommended Vercel Settings:
+- **Framework Preset**: `Vite`
+- **Root Directory**: `./` (Root directory)
+- **Build Command**: `npm run build`
+- **Output Directory**: `dist`
+- **Install Command**: `npm install`
+
+---
+
 ## 🛡️ Security & Safe Handling
 - **No Client Secrets**: VITE variables are removed. Secrets are restricted to backend environment calls.
 - **Safe Inputs**: Chat characters are trimmed at 500 characters, preventing payload buffer attempts.

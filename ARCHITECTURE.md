@@ -23,23 +23,34 @@ StadiumPilot AI is built as a unified intelligent stadium platform. Both the Fan
                    [ decisionEngine.js ]                     [ aiService.js ]
                   (Deterministic logic)                   (Frontend API Client)
                              |                                     |
+                             +------------------+------------------+
+                                                |
+                             +------------------+------------------+
+                             |                                     |
                              v                                     v
-                   [ SVG Routing / POIs ]                    [ server.js ]
-                                                       (Node/Express API Proxy)
-                                                                   |
-                                                +------------------+------------------+
-                                                |                                     |
-                                                v                                     v
-                                    [ Google Gemini API ]                   [ Local Mock AI ]
-                                    (Secure Server Key)                    (Offline Fallback)
+                  [ api/ai/* (Vercel) ]                 [ server.js (Express) ]
+                 (Serverless Deployment)                (Local & Cloud Run Host)
+                             |                                     |
+                             +------------------+------------------+
+                                                |
+                                                v
+                                     +----------+----------+
+                                     |                     |
+                                     v                     v
+                           [ Google Gemini API ]    [ api/ai/_aiHelper.js ]
+                           (Secure Server Key)       (Shared Fallback Core)
 ```
 
-### 1. Secure Backend Server (`server.js`)
-- An Express server that handles:
-  - Hosting static web assets inside `dist/`.
-  - Managing SPA routing fallback to support deep linking.
-  - Proxying client requests to the Google Gemini API securely using the server environment variable `GEMINI_API_KEY`, preventing key leakages in front-end client bundles.
-  - Automatically running the simulated AI fallbacks if the key is missing or the external API is unreachable.
+### 1. Secure Backend Frameworks (Vercel Serverless & Express server.js)
+- **Vercel Serverless Framework (`api/ai/*.js`)**:
+  - Leverages Vercel's edge/serverless infrastructure.
+  - Matches paths to serverless function files: `chat.js`, `brief.js`, and `incident-plan.js`.
+  - Reads `GEMINI_API_KEY` from Vercel’s environment settings, protecting it from frontend exposure.
+- **Express Backend Server (`server.js`)**:
+  - Maintained for local development and future Google Cloud Run Docker compatibility.
+  - Hosts static built files and acts as a local proxy on port `8080`.
+- **Shared AI Logic Helper (`api/ai/_aiHelper.js`)**:
+  - Centralizes simulated fallback routines to keep the architecture DRY. Both Vercel functions and Express handlers import from this module.
 
 ### 2. Data Core (`src/data/stadiumData.js`)
 - Houses structural definitions of the venue layout (coordinates, radii, names).
@@ -64,8 +75,9 @@ StadiumPilot AI is built as a unified intelligent stadium platform. Both the Fan
 - **Operations Alerts**: Scans the stadium zones and transport status logs. If gate limits or transit networks fail, it issues structured high-priority actions for operations staff.
 
 ### 5. Generative AI Client (`src/services/aiService.js`)
-- Triggers POST requests to the secure backend endpoints `/api/ai/chat`, `/api/ai/brief`, and `/api/ai/incident-plan`.
-- Provides a redundant client-side fallback mechanism if the backend Express server is unreachable (for standalone static client tests), ensuring 100% offline stability.
+- Triggers POST requests to relative paths `/api/ai/chat`, `/api/ai/brief`, and `/api/ai/incident-plan`.
+- In Vercel deployments, Vercel routes these dynamically to `api/ai/*.js`.
+- In local development, Vite proxies `/api` calls directly to `http://localhost:8080`.
 
 ### 6. UI Elements
 - **App.jsx**: Global router, role switching header, and accessibility CSS controller.
