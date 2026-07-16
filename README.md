@@ -2,6 +2,10 @@
 
 ### "One AI command center for smarter, safer, and more accessible stadium experiences."
 
+🚀 **Live Production Link**: [https://stadiumpilot-ai-brown.vercel.app](https://stadiumpilot-ai-brown.vercel.app)
+
+---
+
 StadiumPilot AI is an intelligent matchday companion and real-time operations console built for large-scale global tournaments, such as the 2026 football tournament. By combining a spectator-facing assistant with an operational command center, the platform ensures that crucial safety, crowd, and accessibility details propagate instantly across the venue.
 
 ---
@@ -111,28 +115,9 @@ StadiumPilot AI integrates Google Cloud capabilities to secure intelligence:
 
 ---
 
-## 🐳 Cloud Run Deployment
-
-Deploy to Google Cloud Run in a single container using standard commands:
-
-```bash
-# Build the container image in Google Artifact Registry
-gcloud builds submit --tag gcr.io/your-project-id/stadiumpilot-ai
-
-# Deploy the container to Google Cloud Run
-gcloud run deploy stadiumpilot-ai \
-    --image gcr.io/your-project-id/stadiumpilot-ai \
-    --platform managed \
-    --region us-central1 \
-    --allow-unauthenticated \
-    --port 8080
-```
-
----
-
 ## ⚡ Vercel Serverless Deployment
 
-StadiumPilot AI is pre-configured to deploy on Vercel with zero extra code modifications:
+StadiumPilot AI is fully configured for production deployment on Vercel:
 
 1. **Install Vercel CLI** (Optional, if deploying from terminal):
    ```bash
@@ -159,6 +144,25 @@ StadiumPilot AI is pre-configured to deploy on Vercel with zero extra code modif
 - **Build Command**: `npm run build`
 - **Output Directory**: `dist`
 - **Install Command**: `npm install`
+
+---
+
+## 🐳 Alternative Cloud Run Deployment (Supported)
+
+You can also deploy the application to Google Cloud Run in a single container:
+
+```bash
+# Build the container image in Google Artifact Registry
+gcloud builds submit --tag gcr.io/your-project-id/stadiumpilot-ai
+
+# Deploy the container to Google Cloud Run
+gcloud run deploy stadiumpilot-ai \
+    --image gcr.io/your-project-id/stadiumpilot-ai \
+    --platform managed \
+    --region us-central1 \
+    --allow-unauthenticated \
+    --port 8080
+```
 
 ---
 
