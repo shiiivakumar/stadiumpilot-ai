@@ -33,7 +33,8 @@ export default function OpsCenter({
   addIncident, 
   updateIncidentStatus,
   operationsBrief,
-  setOperationsBrief
+  setOperationsBrief,
+  activityFeed
 }) {
   const [briefLoading, setBriefLoading] = useState(false);
   const [selectedIncident, setSelectedIncident] = useState(null);

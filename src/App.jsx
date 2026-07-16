@@ -36,7 +36,8 @@ function MainApp() {
     occupancy,
     averageEntryTime,
     operationsBrief,
-    setOperationsBrief
+    setOperationsBrief,
+    activityFeed
   } = useSimulation();
 
   const activeAlerts = incidents.filter(i => i.status !== 'Resolved').length;
@@ -174,6 +175,7 @@ function MainApp() {
             updateIncidentStatus={updateIncidentStatus}
             operationsBrief={operationsBrief}
             setOperationsBrief={setOperationsBrief}
+            activityFeed={activityFeed}
           />
         )}
       </main>
