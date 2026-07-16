@@ -3,13 +3,6 @@ import React, { useState } from 'react';
 import { STADIUM_ZONES, POINTS_OF_INTEREST, getRoutePath } from '../data/stadiumData';
 import { 
   Info, 
-  MapPin, 
-  Flame, 
-  ShieldAlert, 
-  Heart, 
-  Compass, 
-  Utensils, 
-  Accessibility, 
   RotateCcw,
   Navigation
 } from 'lucide-react';
@@ -21,7 +14,7 @@ export default function StadiumMap({
   selectedEnd, 
   onSelectStart, 
   onSelectEnd,
-  routeInfo 
+  _routeInfo 
 }) {
   const [poiFilter, setPoiFilter] = useState('all'); // 'all' | 'restroom' | 'food' | 'medical' | 'info' | 'emergency_exit'
   const [hoveredZone, setHoveredZone] = useState(null);
@@ -54,10 +47,21 @@ export default function StadiumMap({
     }
   };
 
-  // Generate path coordinates
-  const routePoints = (selectedStart && selectedEnd) 
-    ? getRoutePath(selectedStart, selectedEnd, accessibilitySettings)
-    : [];
+  // Generate path coordinates memoized
+  const routePoints = React.useMemo(() => {
+    return (selectedStart && selectedEnd) 
+      ? getRoutePath(selectedStart, selectedEnd, accessibilitySettings)
+      : [];
+  }, [selectedStart, selectedEnd, accessibilitySettings]);
+
+  // Memoize filtered POIs to avoid recalculating on map updates
+  const filteredPOIs = React.useMemo(() => {
+    return POINTS_OF_INTEREST.filter(poi => {
+      if (poiFilter === 'all') return true;
+      if (poiFilter === 'restroom' && (poi.type === 'restroom' || poi.type === 'restroom_accessible')) return true;
+      return poi.type === poiFilter;
+    });
+  }, [poiFilter]);
 
   const handleZoneClick = (zoneId) => {
     // If start is not set, set it. Otherwise set end. If both are set, reset and set start.
@@ -240,11 +244,7 @@ export default function StadiumMap({
           )}
 
           {/* Points of Interest Icons */}
-          {POINTS_OF_INTEREST.filter(poi => {
-            if (poiFilter === 'all') return true;
-            if (poiFilter === 'restroom' && (poi.type === 'restroom' || poi.type === 'restroom_accessible')) return true;
-            return poi.type === poiFilter;
-          }).map(poi => {
+          {filteredPOIs.map(poi => {
             const isAccessibleRestroom = poi.type === 'restroom_accessible';
             const color = getPoiColor(poi.type);
 

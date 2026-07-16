@@ -2,7 +2,7 @@
 // Proxies all requests to the secure backend server to avoid exposing Gemini keys in browser code.
 // Contains client-side fallbacks in case the backend server is unreachable.
 
-import { STADIUM_ZONES, TRANSIT_OPTIONS } from '../data/stadiumData';
+
 
 // ----------------------------------------------------
 // 1. FAN ASSISTANT INTERFACE

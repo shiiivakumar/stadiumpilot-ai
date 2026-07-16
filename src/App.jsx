@@ -9,10 +9,7 @@ import {
   Compass, 
   Cpu, 
   Accessibility, 
-  MapPin, 
-  Radio, 
-  AlertTriangle,
-  FileText
+  Radio
 } from 'lucide-react';
 
 function MainApp() {

@@ -3,9 +3,6 @@ import React, { useState } from 'react';
 import { 
   Play, 
   Pause, 
-  RotateCcw, 
-  HelpCircle, 
-  Compass, 
   Sliders, 
   ChevronRight, 
   Award,
@@ -18,7 +15,6 @@ export default function DemoPanel({
   setScenario, 
   simulationRunning, 
   setSimulationRunning,
-  currentRole,
   setCurrentRole
 }) {
   const [isOpen, setIsOpen] = useState(true);

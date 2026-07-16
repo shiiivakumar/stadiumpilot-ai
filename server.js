@@ -3,7 +3,6 @@ import express from 'express';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
-import { STADIUM_ZONES } from './src/data/stadiumData.js';
 import { generateFallbackFanResponse, generateFallbackBrief, generateFallbackIncidentPlan } from './api/ai/_aiHelper.js';
 
 // Load environmental variables (development only)

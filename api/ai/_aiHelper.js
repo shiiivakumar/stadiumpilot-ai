@@ -1,5 +1,4 @@
 // Shared AI Fallback Logic for Serverless & Express architectures
-import { STADIUM_ZONES } from '../../src/data/stadiumData.js';
 
 export function generateFallbackFanResponse(message, context, lang) {
   const normalizedMsg = message.toLowerCase();

@@ -11,14 +11,11 @@ import {
   Volume2, 
   VolumeX, 
   Languages, 
-  Accessibility, 
   Navigation, 
   Flame, 
-  Timer, 
   Compass, 
   MapPin, 
   Train,
-  Info,
   Clock
 } from 'lucide-react';
 
@@ -69,12 +66,13 @@ export default function FanAssistant({
   const messagesEndRef = useRef(null);
   const recognitionRef = useRef(null);
 
-  // Initialize Speech Recognition
+  // Initialize Speech Recognition with cleanup support
   useEffect(() => {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    let rec = null;
     if (SpeechRecognition) {
       setSpeechSupported(true);
-      const rec = new SpeechRecognition();
+      rec = new SpeechRecognition();
       rec.continuous = false;
       rec.interimResults = false;
       rec.lang = selectedLanguage === 'hi' ? 'hi-IN' : 
@@ -99,6 +97,14 @@ export default function FanAssistant({
 
       recognitionRef.current = rec;
     }
+
+    return () => {
+      if (rec) {
+        rec.onresult = null;
+        rec.onerror = null;
+        rec.onend = null;
+      }
+    };
   }, [selectedLanguage]);
 
   // Auto-scroll chat to bottom
@@ -106,8 +112,8 @@ export default function FanAssistant({
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  // Text to Speech voice generation
-  const speakText = (text) => {
+  // Text to Speech voice generation memoized
+  const speakText = React.useCallback((text) => {
     if (!ttsActive) return;
     window.speechSynthesis?.cancel(); // stop previous speech
     const utterance = new SpeechSynthesisUtterance(text);
@@ -119,9 +125,10 @@ export default function FanAssistant({
                      selectedLanguage === 'pt' ? 'pt-BR' : 'en-US';
                      
     window.speechSynthesis?.speak(utterance);
-  };
+  }, [selectedLanguage, ttsActive]);
 
-  const handleSendMessage = async (textToSend) => {
+  // handleSendMessage memoized with useCallback
+  const handleSendMessage = React.useCallback(async (textToSend) => {
     if (!textToSend.trim()) return;
 
     const timestamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
@@ -162,7 +169,7 @@ export default function FanAssistant({
     } finally {
       setIsAiLoading(false);
     }
-  };
+  }, [crowds, transit, accessibilitySettings, selectedLanguage, speakText]);
 
   const triggerVoiceInput = () => {
     if (!recognitionRef.current) return;
@@ -175,14 +182,14 @@ export default function FanAssistant({
     }
   };
 
-  // Get active route calculations
-  const routeInfo = getRouteRecommendation(startZone, endZone, accessibilitySettings, crowds);
+  // Get active route calculations memoized
+  const routeInfo = React.useMemo(() => {
+    return getRouteRecommendation(startZone, endZone, accessibilitySettings, crowds);
+  }, [startZone, endZone, accessibilitySettings, crowds]);
 
-  // Transit logic computed based on active status
-  const getBestTransitOption = () => {
-    // If Metro A is critical, Metro B is recommended.
+  // Transit logic computed based on active status memoized
+  const recommendedTransit = React.useMemo(() => {
     const isMetroACrit = transit.metroA === 'critical';
-    const isMetroBCrit = transit.metroB === 'critical';
     const accessibilityFilter = accessibilitySettings.wheelchair || accessibilitySettings.stepFree;
     
     if (isMetroACrit) {
@@ -203,16 +210,13 @@ export default function FanAssistant({
       };
     }
 
-    // Default Metro A
     return {
       rec: TRANSIT_OPTIONS.metroA,
       reason: "Metro Terminal A has high departure frequencies and is the most direct line to the main terminal station.",
       benefit: "Estimated transit time is 15 minutes.",
       alt: "Rideshare zone C (West Lot)."
     };
-  };
-
-  const recommendedTransit = getBestTransitOption();
+  }, [transit, accessibilitySettings]);
 
   return (
     <div className="fan-assistant-layout">

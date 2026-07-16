@@ -1,6 +1,6 @@
 // StadiumPilot AI - Context-Aware Decision Engine
 // Computes deterministic baseline recommendations from live stadium variables.
-import { STADIUM_ZONES, POINTS_OF_INTEREST } from '../data/stadiumData';
+import { STADIUM_ZONES } from '../data/stadiumData';
 
 /**
  * Calculates a route recommendation for a fan from Start to Destination.

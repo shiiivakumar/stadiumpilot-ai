@@ -2,12 +2,11 @@
 import React, { useState, useEffect } from 'react';
 import { generateOperationsBrief, generateIncidentResponsePlan } from '../services/aiService';
 import { getOperationalRecommendations } from '../services/decisionEngine';
-import { STADIUM_ZONES, POINTS_OF_INTEREST } from '../data/stadiumData';
+import { STADIUM_ZONES } from '../data/stadiumData';
 import StadiumMap from './StadiumMap';
 import { 
   Users, 
   ShieldAlert, 
-  CheckCircle, 
   Timer, 
   Map, 
   Train, 
@@ -19,8 +18,6 @@ import {
   AlertTriangle, 
   Plus, 
   FileText,
-  Clock,
-  Wrench,
   X
 } from 'lucide-react';
 
@@ -51,29 +48,31 @@ export default function OpsCenter({
   // Acknowledged recommendations state (to track functioning buttons)
   const [acknowledgedRecs, setAcknowledgedRecs] = useState({});
 
-  // Compute decision-engine recommendations
-  const activeRecommendations = getOperationalRecommendations(crowds, incidents, transit);
+  // Compute decision-engine recommendations memoized
+  const activeRecommendations = React.useMemo(() => {
+    return getOperationalRecommendations(crowds, incidents, transit);
+  }, [crowds, incidents, transit]);
 
-  // Fetch or generate operations brief
-  const loadOperationsBrief = async (force = false) => {
+  // Fetch or generate operations brief wrapped in useCallback
+  const loadOperationsBrief = React.useCallback(async (force = false) => {
     if (operationsBrief && !force) return;
     setBriefLoading(true);
     try {
       const res = await generateOperationsBrief({ occupancy, averageEntryTime, crowds, transit, incidents });
       setOperationsBrief(res.text);
-    } catch (err) {
+    } catch {
       setOperationsBrief("Unable to generate operations briefing at this time.");
     } finally {
       setBriefLoading(false);
     }
-  };
+  }, [operationsBrief, occupancy, averageEntryTime, crowds, transit, incidents, setOperationsBrief]);
 
   useEffect(() => {
     loadOperationsBrief();
-  }, [occupancy, averageEntryTime, crowds, transit, incidents]);
+  }, [loadOperationsBrief]);
 
   // Load AI response plan when selected incident changes
-  const loadIncidentResponsePlan = async (incident) => {
+  const loadIncidentResponsePlan = React.useCallback(async (incident) => {
     if (!incident) {
       setIncidentPlan(null);
       return;
@@ -82,12 +81,12 @@ export default function OpsCenter({
     try {
       const res = await generateIncidentResponsePlan(incident);
       setIncidentPlan(res.text);
-    } catch (err) {
+    } catch {
       setIncidentPlan("Failed to load emergency response steps.");
     } finally {
       setPlanLoading(false);
     }
-  };
+  }, []);
 
   const handleSelectIncident = (inc) => {
     setSelectedIncident(inc);

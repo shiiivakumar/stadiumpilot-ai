@@ -1,6 +1,6 @@
 // StadiumPilot AI - Simulation Context & Global State Engine
 import React, { createContext, useState, useEffect, useContext, useCallback } from 'react';
-import { DEMO_SCENARIOS, STADIUM_ZONES, TRANSIT_OPTIONS } from '../data/stadiumData';
+import { DEMO_SCENARIOS, STADIUM_ZONES } from '../data/stadiumData';
 
 const SimulationContext = createContext(null);
 
@@ -177,16 +177,32 @@ export const SimulationProvider = ({ children }) => {
         if (Math.random() < 0.1) {
           const zoneKeys = Object.keys(STADIUM_ZONES).filter(key => !STADIUM_ZONES[key].isExternal);
           const randomZone = zoneKeys[Math.floor(Math.random() * zoneKeys.length)];
-          const currentLevel = crowds[randomZone];
           
-          let nextLevel = currentLevel;
-          if (currentLevel === 'LOW') nextLevel = 'MODERATE';
-          else if (currentLevel === 'MODERATE') nextLevel = Math.random() > 0.5 ? 'HIGH' : 'LOW';
-          else if (currentLevel === 'HIGH') nextLevel = Math.random() > 0.5 ? 'CRITICAL' : 'MODERATE';
-          
-          if (nextLevel !== currentLevel) {
-            updateZoneCrowd(randomZone, nextLevel);
-          }
+          setCrowds(prev => {
+            const currentLevel = prev[randomZone];
+            let nextLevel = currentLevel;
+            if (currentLevel === 'LOW') nextLevel = 'MODERATE';
+            else if (currentLevel === 'MODERATE') nextLevel = Math.random() > 0.5 ? 'HIGH' : 'LOW';
+            else if (currentLevel === 'HIGH') nextLevel = Math.random() > 0.5 ? 'CRITICAL' : 'MODERATE';
+            
+            if (nextLevel !== currentLevel) {
+              const timestamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+              setActivityFeed(prevFeed => [
+                {
+                  id: `crowd-${Date.now()}`,
+                  time: timestamp,
+                  message: `Crowd in ${STADIUM_ZONES[randomZone]?.name || randomZone} updated to ${nextLevel}.`,
+                  type: 'crowd'
+                },
+                ...prevFeed
+              ]);
+              return {
+                ...prev,
+                [randomZone]: nextLevel
+              };
+            }
+            return prev;
+          });
         }
       }, 5000);
     }
@@ -194,10 +210,10 @@ export const SimulationProvider = ({ children }) => {
     return () => {
       if (interval) clearInterval(interval);
     };
-  }, [simulationRunning, crowds, updateZoneCrowd]);
+  }, [simulationRunning]);
 
-  // Value payload
-  const value = {
+  // Value payload memoized for rendering efficiency
+  const value = React.useMemo(() => ({
     activeScenario,
     crowds,
     incidents,
@@ -218,7 +234,25 @@ export const SimulationProvider = ({ children }) => {
     updateZoneCrowd,
     addIncident,
     updateIncidentStatus
-  };
+  }), [
+    activeScenario,
+    crowds,
+    incidents,
+    transit,
+    occupancy,
+    averageEntryTime,
+    simulationRunning,
+    operationsBrief,
+    activityFeed,
+    accessibilitySettings,
+    selectedLanguage,
+    toggleAccessibility,
+    setSelectedLanguage,
+    setScenario,
+    updateZoneCrowd,
+    addIncident,
+    updateIncidentStatus
+  ]);
 
   return (
     <SimulationContext.Provider value={value}>

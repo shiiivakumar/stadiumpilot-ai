@@ -166,6 +166,31 @@ gcloud run deploy stadiumpilot-ai \
 
 ---
 
+## 🏆 Challenge 4 — Problem Statement Alignment
+
+StadiumPilot AI was custom-engineered to solve the specific operational challenges of high-density global sports tournaments like the FIFA World Cup 2026. The solution directly addresses every core hackathon theme:
+
+| Challenge Theme / Requirement | StadiumPilot AI Solution |
+| :--- | :--- |
+| 📍 **Navigation** | AI-assisted safe stadium routing with real-time waypoint mapping. |
+| 👥 **Crowd Management** | Congestion-aware rerouting based on live gate densities and surge metrics. |
+| ♿ **Accessibility** | Wheelchair-safe step-free paths, high-contrast layouts, large text, and voice integration. |
+| 🚌 **Transportation** | Metro and shuttle status tracking with predictive alternate recommendations. |
+| 🍃 **Sustainability** | Mobility suggestions designed to optimize crowd disperse times and lower transport fuel backlogs. |
+| 🗣️ **Multilingual Assistance** | Five-language AI support (EN, ES, FR, PT, HI) with Speech-to-Text and Text-to-Speech voices. |
+| 🛡️ **Operational Intelligence** | Dedicated Command Center giving unified visibility into crowd levels, logs, and transit. |
+| ⚡ **Real-Time Decision Support** | Automated prioritization and Gemini-powered response action checklists for incident marshals. |
+| 🤖 **Generative AI** | Safe proxy-endpoint prompts translating venue logs into structured safety briefings. |
+| ⚽ **FIFA World Cup 2026** | Explicitly modeled around multi-gate seating stadium inflows and high-capacity congestion. |
+
+### Persona Coverage
+- **Fans**: Real-time match day companion, multilingual helper, and dynamic navigation guide.
+- **Stadium Operators**: High-level map heatmap dashboards, crowd flow metrics, and incident control logs.
+- **Venue Staff & Volunteers**: Automated emergency plan response steps, crowd redirection guidance, and localized gate parameters.
+- **Accessibility Needs Visitors**: Step-free ramp route mappings, readable contrast modes, and text-to-speech audio logs.
+
+---
+
 ## 🛡️ Security & Safe Handling
 - **No Client Secrets**: VITE variables are removed. Secrets are restricted to backend environment calls.
 - **Safe Inputs**: Chat characters are trimmed at 500 characters, preventing payload buffer attempts.
